@@ -240,7 +240,7 @@ app.post('/api/attendance', (req, res) => {
     const attendanceDate = new Date().toISOString().slice(0, 10);
   
     // Check if attendance already marked for today
-    const checkQuery = 'SELECT * FROM Attendance WHERE userId = ? AND attendanceDate = ?';
+    const checkQuery = 'SELECT * FROM attendance WHERE userId = ? AND attendanceDate = ?';
     const checkValues = [userId, attendanceDate];
   
     connection.query(checkQuery, checkValues, (checkErr, checkResults) => {
