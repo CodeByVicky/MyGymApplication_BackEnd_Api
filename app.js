@@ -5,7 +5,7 @@ const app = express();
 app.use(express.json());
 const cors = require('cors');
 app.use(cors());
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 3000;
 
 //get
 app.get("/api/show",(req,res)=>{
@@ -255,7 +255,7 @@ app.post('/api/attendance', (req, res) => {
       }
   
       // If not, insert new attendance record
-      const insertQuery = 'INSERT INTO Attendance (userId, attendanceDate, isPresent) VALUES (?, ?, true)';
+      const insertQuery = 'INSERT INTO attendance (userId, attendanceDate, isPresent) VALUES (?, ?, true)';
       const insertValues = [userId, attendanceDate];
   
       connection.query(insertQuery, insertValues, (insertErr, insertResults) => {
@@ -459,7 +459,7 @@ app.post("/api/loginUser",(req,res)=>{
 
 //login Authontication admin
 app.post("/api/loginAdmin",(req,res)=>{
-  const sql = "select * from adminLogin where email = ? and password = ?"
+  const sql = "select * from adminlogin where email = ? and password = ?"
   const data = [req.body.email , req.body.password]
   try{
     connection.query(sql,data,(err,result)=>{
