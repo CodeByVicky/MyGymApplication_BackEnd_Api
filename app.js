@@ -27,28 +27,53 @@ app.get("/api/show",(req,res)=>{
 
 //post
 app.post("/api/create", (req, res) => {
-    const sql = "insert into gymtable set ?";
-    const data = {
-        name: req.body.name, userId: req.body.userId,
-        password: req.body.password, joinDate: req.body.joinDate,
-        mobileNumber: req.body.mobileNumber, plan: req.body.plan,
-        city: req.body.city, profilePhoto: req.body.profilePhoto,
-        address : req.body.address
-    }
-    try {
-        connection.query(sql, data, (err, result) => {
-            if (err) {
-                console.error("Database error:", err);
-                res.status(500).json({ error: 'An error occurred while processing your request' });
-                return;
-            }
-            res.json({ message: "record add succesfull..." })
-        })
-    } catch (err) {
-        console.error("Exception:", err);
-        res.status(500).json({ error: 'An error occurred while processing your request' });
-    }
-})
+  // Function to calculate activeDate based on plan and joinDate
+  const calculateActiveDate = (joinDate, plan) => {
+      const date = new Date(joinDate);
+      switch (plan) {
+          case 'Monthly':
+              date.setMonth(date.getMonth() + 1);
+              break;
+          case 'Semiannually':
+              date.setMonth(date.getMonth() + 6);
+              break;
+          case 'Annually':
+              date.setFullYear(date.getFullYear() + 1);
+              break;
+          default:
+              throw new Error("Invalid plan type");
+      }
+      return date.toISOString().split('T')[0]; // Convert to YYYY-MM-DD format
+  };
+
+  try {
+      const data = {
+          name: req.body.name,
+          userId: req.body.userId,
+          password: req.body.password,
+          joinDate: req.body.joinDate,
+          mobileNumber: req.body.mobileNumber,
+          plan: req.body.plan,
+          city: req.body.city,
+          profilePhoto: req.body.profilePhoto,
+          address: req.body.address,
+          activeDate: calculateActiveDate(req.body.joinDate, req.body.plan)
+      };
+
+      const sql = "INSERT INTO gymtable SET ?";
+      connection.query(sql, data, (err, result) => {
+          if (err) {
+              console.error("Database error:", err);
+              res.status(500).json({ error: 'An error occurred while processing your request' });
+              return;
+          }
+          res.json({ message: "Record added successfully..." });
+      });
+  } catch (err) {
+      console.error("Exception:", err);
+      res.status(500).json({ error: 'An error occurred while processing your request' });
+  }
+});
 
 //expires
 app.get("/api/expires",(req,res)=>{
