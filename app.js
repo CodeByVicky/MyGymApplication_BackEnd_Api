@@ -27,7 +27,8 @@ app.get("/api/show",(req,res)=>{
 
 //post
 app.post("/api/create", (req, res) => {
-  // Function to calculate activeDate based on plan and joinDate
+  console.log("Request body:", req.body); // Log the incoming request body
+
   const calculateActiveDate = (joinDate, plan) => {
       const date = new Date(joinDate);
       switch (plan) {
@@ -47,30 +48,36 @@ app.post("/api/create", (req, res) => {
   };
 
   try {
+      const { name, userId, password, joinDate, mobileNumber, plan, city, profilePhoto, address } = req.body;
+      if (!name || !userId || !password || !joinDate || !mobileNumber || !plan || !city || !profilePhoto || !address) {
+          res.status(400).json({ error: 'All fields are required' });
+          return;
+      }
+
       const data = {
-          name: req.body.name,
-          userId: req.body.userId,
-          password: req.body.password,
-          joinDate: req.body.joinDate,
-          mobileNumber: req.body.mobileNumber,
-          plan: req.body.plan,
-          city: req.body.city,
-          profilePhoto: req.body.profilePhoto,
-          address: req.body.address,
-          activeDate: calculateActiveDate(req.body.joinDate, req.body.plan)
+          name,
+          userId,
+          password,
+          joinDate,
+          mobileNumber,
+          plan,
+          city,
+          profilePhoto,
+          address,
+          activeDate: calculateActiveDate(joinDate, plan)
       };
 
       const sql = "INSERT INTO gymtable SET ?";
       connection.query(sql, data, (err, result) => {
           if (err) {
-              console.error("Database error:", err);
+              console.error("Database error:", err); // Log detailed error
               res.status(500).json({ error: 'An error occurred while processing your request' });
               return;
           }
           res.json({ message: "Record added successfully..." });
       });
   } catch (err) {
-      console.error("Exception:", err);
+      console.error("Exception:", err); // Log detailed error
       res.status(500).json({ error: 'An error occurred while processing your request' });
   }
 });
